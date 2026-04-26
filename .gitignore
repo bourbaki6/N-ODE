@@ -8,10 +8,6 @@ venv/
 .env/
 .envrc
 
-data/
-*.pt
-*.pth
-
 outputs/
 logs/
 
