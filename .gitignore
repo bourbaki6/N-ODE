@@ -11,5 +11,8 @@ venv/
 outputs/
 logs/
 
+git/
+.gitignore
+
 .vscode/
 .idea/
