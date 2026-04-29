@@ -1,0 +1,30 @@
+
+dataset:
+  name: fashion_mnist
+  data_dir: ./data
+  batch_size: 128
+  num_workers: 2
+  augment_train: true      
+
+model:
+  hidden_dim: 64
+  num_classes: 10
+  solver: rk4
+  num_steps: 10
+  input_dim: 784
+
+training:
+  epochs: 40               
+  lr: 1e-3
+  weight_decay: 1e-4       
+  lr_scheduler: cosine
+  lr_min: 1e-5
+  grad_clip: 1.0
+
+logging:
+  log_dir: ./logs
+  run_name: ode_rk4_fashion
+  checkpoint_dir: ./checkpoints
+  save_every: 5
+  eval_every: 1
+
