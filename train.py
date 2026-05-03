@@ -33,8 +33,8 @@ def train_one_epoch(
         images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
-        log_probs = model(images)             # [batch, num_classes]
-        loss = criterion(log_probs, labels)   # scalar
+        log_probs = model(images)             
+        loss = criterion(log_probs, labels)  
 
         loss.backward()
     
@@ -123,21 +123,18 @@ def train(cfg: dict, model: nn.Module, device: torch.device):
         print(f"\nEpoch {epoch}/{t_cfg['epochs']}")
         current_lr = scheduler.get_last_lr()[0]
 
-        # ── Train ──────────────────────────────────────────────────────────────
+    
         train_loss, train_acc = train_one_epoch(
             model, train_loader, optimizer, criterion, device,
             grad_clip=t_cfg.get("grad_clip", 1.0),
         )
 
-        # ── Evaluate ───────────────────────────────────────────────────────────
         test_loss, test_acc = evaluate(model, test_loader, criterion, device)
 
-        # ── Measure NFE (Neural ODE only) ──────────────────────────────────────
         nfe = None
         if hasattr(model, "nfe"):
             nfe = measure_nfe(model, test_loader, device, num_batches=5)
 
-        # ── Log ────────────────────────────────────────────────────────────────
         log_kwargs = dict(
             train_loss = train_loss,
             test_loss = test_loss,
@@ -150,7 +147,6 @@ def train(cfg: dict, model: nn.Module, device: torch.device):
 
         logger.log(epoch = epoch, **log_kwargs)
 
-        # ── Step LR Scheduler ──────────────────────────────────────────────────
         scheduler.step()
 
         if epoch % l_cfg.get("save_every", 5) == 0:
