@@ -8,9 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from models import NeuralODEClassifier
+from models.classifier import NeuralODEClassifier
 from data.dataset import get_dataloaders
-from utils import get_device, load_checkpoint, compute_accuracy
+from utils import get_device, load_checkpoint
 
 
 def benchmark_solver(
@@ -100,14 +100,14 @@ def run_comparison(model, test_loader, device, save_dir: str):
     for solver, color in [("euler", "tomato"), ("rk4", "steelblue"), ("rk45", "seagreen")]:
         accs = [r["accuracy"] * 100 for r in results[solver]]
         nfes = [r["avg_nfe"] for r in results[solver]]
-        ax.plot(nfes, accs, "o-", color=color, label=solver.upper(), linewidth=2)
+        ax.plot(nfes, accs, "o-", color = color, label = solver.upper(), linewidth = 2)
 
     ax.set_xlabel("Average NFE per forward pass", fontsize = 11)
     ax.set_ylabel("Test Accuracy (%)", fontsize = 11)
     ax.set_title("Accuracy vs NFE", fontsize = 10)
     ax.legend()
     ax.grid(True, alpha = 0.3)
-    ax.annotate("\n Higher accuracy\n← Fewer evaluations\n(top-left corner is ideal)",
+    ax.annotate("\n Higher accuracy\n and  Fewer evaluations\n(top-left corner is ideal)",
                 xy = (0.02, 0.02), xycoords="axes fraction", fontsize = 8,
                 bbox=dict(boxstyle="round", facecolor="lightyellow", alpha = 0.8))
 

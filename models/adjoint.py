@@ -58,7 +58,7 @@ class AdjointODEFunc(Function):
 
             return (dh_dt, da_dt) + dp_dt
 
-        # Pack initial augmented state: (h1, a(1), zero_param_grads)
+    
         aug_state = (h1.detach(), adj_h) + adj_params
 
         num_steps = 10
@@ -69,16 +69,14 @@ class AdjointODEFunc(Function):
                 t0.item() + i * dt,
                 dtype=h0.dtype, device=h0.device
             )
-            # Compute derivatives of augmented state at this time
+
             aug_derivs = augmented_dynamics(t_cur, aug_state)
 
-            # Euler step BACKWARDS (subtract the forward derivative)
             aug_state = tuple(
                 s - d * dt
                 for s, d in zip(aug_state, aug_derivs)
             )
 
-        # Unpack: aug_state[0] = h(0) (reconstructed), aug_state[1] = a(0) = dL/dh0
         dL_dh0 = aug_state[1]
         dL_dparams = aug_state[2:]
 
@@ -96,11 +94,7 @@ class AdjointODEBlock(nn.Module):
     def forward(self, h: torch.Tensor) -> torch.Tensor:
         
         self.odefunc.reset_nfe()
-
-        # Collect current parameters for the custom Function
         params = tuple(self.odefunc.parameters())
-
-        # Call the adjoint autograd Function
         h1 = AdjointODEFunc.apply(h, self.t0, self.t1, self.odefunc, *params)
 
         return h1

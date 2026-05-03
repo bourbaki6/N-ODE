@@ -4,16 +4,16 @@ import time
 import numpy as np
 import torch
 import matplotlib
-matplotlib.use("Agg")           # no display needed — saves to file
+matplotlib.use("Agg")          
 import matplotlib.pyplot as plt
 from data.dataset import get_dataloaders, get_class_names, DATASET_STATS
 
-GREEN  = "\033[92m"
-RED    = "\033[91m"
+GREEN = "\033[92m"
+RED = "\033[91m"
 YELLOW = "\033[93m"
-BLUE   = "\033[94m"
-RESET  = "\033[0m"
-BOLD   = "\033[1m"
+BLUE = "\033[94m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
 
 def ok(msg):   print(f" {GREEN}ok{RESET}  {msg}")
 def fail(msg): print(f" {RED}no{RESET}  {msg}")
@@ -76,10 +76,10 @@ def check_normalisation(images: torch.Tensor, dataset_name: str):
     mean_val = images.mean().item()
     std_val = images.std().item()
     min_val = images.min().item()
-    max_val  = images.max().item()
+    max_val = images.max().item()
 
-    info(f"Pixel mean  : {mean_val:+.4f}  (target ≈ 0.0)")
-    info(f"Pixel std   : {std_val:.4f}   (target ≈ 1.0)")
+    info(f"Pixel mean : {mean_val:+.4f}  (target ≈ 0.0)")
+    info(f"Pixel std : {std_val:.4f}   (target ≈ 1.0)")
     info(f"Pixel range : [{min_val:.3f}, {max_val:.3f}]")
 
 
@@ -145,7 +145,7 @@ def check_loader_speed(train_loader, n_batches: int = 20):
         if i >= n_batches:
             break
         t_end = time.perf_counter()
-        if i > 0:  # skip first batch (disk cache warm-up)
+        if i > 0:  
             times.append((t_end - t_start) * 1000)
         t_start = t_end
 
@@ -179,14 +179,14 @@ def check_visual(images: torch.Tensor, labels: torch.Tensor,
     std = stats["std"][0]
 
     display = images[:32].clone()
-    display = display * std + mean          # undo normalisation
-    display = display.clamp(0, 1)           # clamp to [0, 1] for display
+    display = display * std + mean        
+    display = display.clamp(0, 1)           
 
-    fig, axes = plt.subplots(4, 8, figsize=(14, 7))
+    fig, axes = plt.subplots(4, 8, figsize = (14, 7))
     fig.suptitle(
         f"{dataset_name.upper()} — Sample Images (de-normalised for display)\n"
         f"If these look wrong (inverted, scrambled, blank), investigate immediately.",
-        fontsize=11
+        fontsize = 11
     )
 
     for idx, ax in enumerate(axes.flat):
@@ -194,26 +194,24 @@ def check_visual(images: torch.Tensor, labels: torch.Tensor,
             ax.axis("off")
             continue
         img = display[idx].squeeze().numpy()
-        ax.imshow(img, cmap="gray", vmin=0, vmax=1)
-        ax.set_title(class_names[labels[idx].item()], fontsize=7)
+        ax.imshow(img, cmap = "gray", vmin= 0, vmax = 1)
+        ax.set_title(class_names[labels[idx].item()], fontsize = 7)
         ax.axis("off")
 
     plt.tight_layout()
-    plt.savefig(save_path, dpi=120, bbox_inches="tight")
+    plt.savefig(save_path, dpi = 120, bbox_inches = "tight")
     plt.close()
 
     ok(f"Sample grid saved to: {save_path}")
-    warn("Open this file and visually verify the images look correct before training")
-
 
 def check_full_epoch(train_loader):
     
     print(f"\n{BOLD}[7] Full Epoch Iteration{RESET}")
-    info("Iterating full training set once — this may take 30–60 seconds...")
+    info("Iterating full training set")
 
     t0 = time.time()
-    n_batches  = 0
-    n_samples  = 0
+    n_batches = 0
+    n_samples = 0
     batch_sizes = []
 
     try:
@@ -252,7 +250,7 @@ def check_model_compatibility(train_loader):
 
     try:
         from models import NeuralODEClassifier
-        model = NeuralODEClassifier(solver="euler", num_steps=2)
+        model = NeuralODEClassifier(solver = "euler", num_steps = 2)
         model.eval()
 
         images, labels = next(iter(train_loader))
@@ -262,7 +260,7 @@ def check_model_compatibility(train_loader):
 
         expected_shape = (images.size(0), 10)
         if tuple(log_probs.shape) == expected_shape:
-            ok(f"Output shape : {tuple(log_probs.shape)}  ✓")
+            ok(f"Output shape : {tuple(log_probs.shape)} ")
         else:
             fail(f"Output shape : {tuple(log_probs.shape)}  expected {expected_shape}")
 
@@ -284,7 +282,7 @@ def check_model_compatibility(train_loader):
         else:
             fail(f"NLLLoss returned {loss.item()} — check label range and model output")
 
-        ok(f"NFE after forward  : {model.nfe} (Euler, 2 steps → expect 2)")
+        ok(f"NFE after forward  : {model.nfe} (Euler, 2 steps -> expect 2)")
 
     except ImportError:
         warn("models/ not found — skipping model compatibility check")
@@ -306,20 +304,20 @@ def validate(dataset_name: str):
     check_label_distribution(train_loader, test_loader, dataset_name)
     check_loader_speed(train_loader)
     check_visual(train_images, train_labels, dataset_name,
-                 save_path=f"data_sample_{dataset_name}.png")
+                 save_path = f"data_sample_{dataset_name}.png")
     check_full_epoch(train_loader)
     check_model_compatibility(train_loader)
 
     print(f"\n{'='*60}")
-    print(f"  Validation complete for {dataset_name.upper()}")
-    print(f"  Open data_sample_{dataset_name}.png and visually verify")
+    print(f" Validation complete for {dataset_name.upper()}")
+    print(f" Open data_sample_{dataset_name}.png and visually verify")
     print(f"{'='*60}\n")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate dataset pipeline")
+    parser = argparse.ArgumentParser(description = "Validate dataset pipeline")
     parser.add_argument(
-        "--dataset", type=str, default="both",
+        "--dataset", type = str, default = "both",
         choices=["mnist", "fashion_mnist", "both"],
         help="Which dataset to validate"
     )
