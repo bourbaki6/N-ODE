@@ -29,15 +29,13 @@ def get_hidden_trajectories(model: NeuralODEClassifier, loader, device: torch.de
             images = images.to(device)
             batch_size = images.size(0)
 
-            # Get initial hidden state h(0) through input projection
             x = images.view(batch_size, -1)
-            h0 = model.input_proj(x)  # [batch, hidden_dim]
+            h0 = model.input_proj(x)  
 
-            # Record trajectory by integrating step by step
+
             traj = [h0.cpu().numpy()]
             h = h0
 
-            # Integrate manually at specified time points
             dt = 1.0 / (num_steps - 1)
             for i in range(1, num_steps):
                 t_cur = torch.tensor(ts[i-1], dtype=h.dtype, device=device)
@@ -45,8 +43,7 @@ def get_hidden_trajectories(model: NeuralODEClassifier, loader, device: torch.de
                 h = h + dh * dt
                 traj.append(h.cpu().numpy())
 
-            # Stack: traj[i] is [batch, hidden_dim] → transpose to [batch, T, hidden_dim]
-            traj_array = np.stack(traj, axis=1)  # [batch, T, hidden]
+            traj_array = np.stack(traj, axis=1) 
 
             all_trajs.append(traj_array)
             all_h0.append(h0.cpu().numpy())
@@ -76,7 +73,6 @@ def plot_phase_portrait(
     pca = PCA(n_components=2)
     pca.fit(data["h1"])
 
-    # Project trajectories into PCA space
     trajs_2d = []
     for traj in data["trajectories"]:
         trajs_2d.append(pca.transform(traj))  # [T, 2]
@@ -84,7 +80,7 @@ def plot_phase_portrait(
     h0_2d = pca.transform(data["h0"])
     h1_2d = pca.transform(data["h1"])
 
-    # Grid bounds from actual data (with small padding)
+
     x_min, x_max = h0_2d[:, 0].min() - 0.5, h0_2d[:, 0].max() + 0.5
     y_min, y_max = h0_2d[:, 1].min() - 0.5, h0_2d[:, 1].max() + 0.5
 
@@ -93,7 +89,7 @@ def plot_phase_portrait(
         np.linspace(x_min, x_max, grid_size),
         np.linspace(y_min, y_max, grid_size),
     )
-    grid_2d = np.stack([gx.ravel(), gy.ravel()], axis=1)  # [G, 2]
+    grid_2d = np.stack([gx.ravel(), gy.ravel()], axis=1) 
 
 
     grid_64d = pca.inverse_transform(grid_2d)  #---an approx., [G, 64]---#
@@ -104,7 +100,7 @@ def plot_phase_portrait(
     with torch.no_grad():
         dh_64d = model.odefunc(t_tensor, grid_tensor).numpy()  # [G, 64]
 
-    # Project the derivatives into 2D PCA space
+
     dh_2d = pca.transform(dh_64d) - pca.transform(np.zeros_like(dh_64d))
     u = dh_2d[:, 0].reshape(grid_size, grid_size)
     v = dh_2d[:, 1].reshape(grid_size, grid_size)
@@ -160,7 +156,7 @@ def plot_phase_portrait(
             ax2.scatter(traj_2d[-1, 0], traj_2d[-1, 1], s=20, marker="x",
                        c=[colors_10[cls_idx]], linewidths=1.5, zorder=5)
 
-    ax2.set_title("ODE Trajectories h(0)→h(1) per class\n(○ = start, × = end)", fontsize=10)
+    ax2.set_title("ODE Trajectories h(0) -> h(1) per class\n(○ = start, × = end)", fontsize=10)
     ax2.set_xlabel(f"PC1")
     ax2.set_ylabel(f"PC2")
 
