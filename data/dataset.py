@@ -68,10 +68,10 @@ def get_num_classes(dataset_name: str) -> int:
 
 
 def _build_transforms(dataset_name: str, train: bool, augment_train: bool) -> transforms.Compose:
-    info  = DATASET_STATS[dataset_name]
-    mean  = info["mean"]
-    std   = info["std"]
-    size  = info["image_size"]
+    info = DATASET_STATS[dataset_name]
+    mean = info["mean"]
+    std = info["std"]
+    size = info["image_size"]
     is_rgb = info["channels"] == 3
 
     tfm_list = []
@@ -82,12 +82,12 @@ def _build_transforms(dataset_name: str, train: bool, augment_train: bool) -> tr
     if train and augment_train:
         if is_rgb:
     
-            tfm_list.append(transforms.RandomCrop(size, padding=4))
-            tfm_list.append(transforms.RandomHorizontalFlip(p=0.5))
+            tfm_list.append(transforms.RandomCrop(size, padding = 4))
+            tfm_list.append(transforms.RandomHorizontalFlip(p = 0.5))
         else:
     
             if dataset_name == "fashion_mnist":
-                tfm_list.append(transforms.RandomHorizontalFlip(p=0.5))
+                tfm_list.append(transforms.RandomHorizontalFlip(p = 0.5))
 
     tfm_list.append(transforms.ToTensor())
 
@@ -96,28 +96,23 @@ def _build_transforms(dataset_name: str, train: bool, augment_train: bool) -> tr
     return transforms.Compose(tfm_list)
 
 
-def _load_dataset(
-    dataset_name: str,
-    data_dir: str,
-    train: bool,
-    transform,
-):
+def _load_dataset(dataset_name: str,data_dir: str, train: bool, transform):
     cls = _DATASET_CLASS[dataset_name]
 
     if dataset_name in _USES_SPLIT_ARG:
         #--- STL-10 uses split='train' or split='test' ---#
         return cls(
-            root=data_dir,
-            split="train" if train else "test",
-            transform=transform,
-            download=True,
+            root = data_dir,
+            split = "train" if train else "test",
+            transform = transform,
+            download = True,
         )
     else:
         return cls(
-            root=data_dir,
-            train=train,
-            transform=transform,
-            download=True,
+            root = data_dir,
+            train = train,
+            transform  = transform,
+            download = True,
         )
 
 
