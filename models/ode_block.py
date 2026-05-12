@@ -1,3 +1,6 @@
+#--- This wraps an ODEFunction and a choice of solver
+#    into 1 layer. have included all solvers---#
+
 import torch
 import torch.nn as nn
 from .ode_solver import Euler, RK4, RK45
@@ -25,15 +28,9 @@ class ODEBlock(nn.Module):
         self.t0 = t0
         self.t1 = t1
 
-        if solver == "adjoint":
-            self._adjoint_block = AdjointODEBlock(odefunc, t0, t1)
+        self._adjoint_block =(AdjointODEBlock(odefunc, t0, t1) if solver == "adjoint" 
+                              else None)
        
-        else:
-            self._adjoint_block = None
- 
-        self.nfe_history = []
-
-    
     def forward(self, h: torch.Tensor) -> torch.Tensor:
 
         self.odefunc.reset_nfe()
@@ -63,17 +60,14 @@ class ODEBlock(nn.Module):
                 t0 = self.t0, t1 = self.t1,
                 rtol = self.rtol, atol = self.atol,
             )
-
             self.odefunc.nfe = rk45_nfe
 
         else:
-
             raise ValueError(
                 f"Unknown solver '{self.solver}'. "
                 f"Choose from: 'euler', 'rk4', 'rk45', 'adjoint'."
             )
         self.nfe_history.append(self.odefunc.nfe)
-
         return h1
     
     @property

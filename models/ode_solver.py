@@ -1,4 +1,4 @@
-#---Numerical ODE solvers: Euler, RK4, RK45---#
+#---Numerical ODE solvers: Euler, RK4, RK45 aka Dormand Price---#
 
 import torch
 from typing import Callable
@@ -6,13 +6,13 @@ from typing import Callable
 from .odefunc import ODEFunction
 
 class Euler:
-    #---Only for 1st order ODE---#
+    #---Only for 1st order ODE. Fixed step size---#
     @staticmethod
     def euler_solve(func: Callable, h0: torch.Tensor, t0: float = 0.0, t1: float = 1.0, num_steps: int= 10) -> torch.Tensor:
         h = h0
-        t = torch.tensor(t0, dtype = h0.dtype, device = h0.device)
         dt = (t1 - t0) /num_steps
         dt_tensor = torch.tensor(dt, dtype = h0.dtype, device = h0.device)
+        t = torch.tensor(t0, dtype = h0.dtype, device = h0.device)
 
         for _ in range(num_steps):
             #--- Euler update---#
@@ -22,15 +22,14 @@ class Euler:
 
         return h
     
-
 class RK4:
+
     @staticmethod
     def rk4_solver(func: Callable, h0: torch.Tensor, t0: float = 0.0, t1: float = 1.0, num_steps: int = 10) -> torch.Tensor:
         
         dt = (t1 - t0) /num_steps
         h = h0
-        t = torch.tensor(t0, dtype = h0.dtype, device = h0.device)
-        
+        t = torch.tensor(t0, dtype = h0.dtype, device = h0.device) 
         dt_t = torch.tensor(dt, dtype = h0.dtype, device = h0.device)
         half_dt = dt_t * 0.5
 
@@ -47,17 +46,19 @@ class RK4:
 
         return h
     
-#---solving using dormand-price RK45 adaptive step method---#
+#---solving using RK45 adaptive step method---#
 class RK45:
+
     @staticmethod
     def rk45_solve(func: Callable, h0: torch.Tensor,
                    t0: float = 0.0, t1: float = 1.0,
                    rtol: float = 1e-3,atol: float = 1e-4,
                    min_dt: float = 1e-5, max_dt: float = 1.0,
                    ) -> tuple[torch.Tensor, int]:
-        
+        #---butcher tableau nodes---#
         c2, c3, c4, c5 = 1/5, 3/10, 4/5, 8/9
 
+        #---Stage Coeff---#
         a21 = 1/5
         a31, a32 = 3/40, 9/40
         a41, a42, a43 = 44/45, - 56/15, 32/9
@@ -67,8 +68,7 @@ class RK45:
         #---5th order sol wts.(b*) used as the actual update---#
         b1, b3, b4, b5, b6 = 35/384, 500/1113, 125/192, -2187/6784, 11/84
 
-        #---4th order sol wts. (e) - only used for error estimate---#
-
+        #---4th order sol wts. (e) - only used for error estimate ie (diff between 4th and 5th order)---#
         e1 = 71/57600
         e3 = -71/16695
         e4 = 71/1920

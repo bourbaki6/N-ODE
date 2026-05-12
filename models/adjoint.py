@@ -1,5 +1,9 @@
 #---adjoint sensitivity method is the core 
 #   contribution of teh Chen paper---#
+#---Instead of backpropagating through all ODE solver steps (which requires
+#   storing O(T) intermediate states), the adjoint method solves a second ODE
+#   backwards in time to compute gradients with O(1) memory cost.---#
+
 
 import torch
 import torch.nn as nn
@@ -26,7 +30,6 @@ class AdjointODEFunc(Function):
         
         h0, t0, t1, h1 = ctx.saved_tensors
         func = ctx.func
-        n_params = ctx.n_params
 
         adj_h = dL_dh1.clone()
 
@@ -67,7 +70,7 @@ class AdjointODEFunc(Function):
         for i in range(num_steps - 1, -1, -1):
             t_cur = torch.tensor(
                 t0.item() + i * dt,
-                dtype=h0.dtype, device=h0.device
+                dtype = h0.dtype, device = h0.device
             )
 
             aug_derivs = augmented_dynamics(t_cur, aug_state)

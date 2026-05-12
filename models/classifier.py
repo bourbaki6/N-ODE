@@ -1,9 +1,11 @@
-
+#---Arch.: 
+#       input: linear -> GroupNorm -> Tanh
+#       ode_block: ODEFunction integrated by the chosen solver
+#       output: GroupNorm -> Linear ----# 
 import torch
 import torch.nn as nn
 from models.odefunc import ODEFunction
 from .ode_block import ODEBlock
-
 
 class NeuralODEClassifier(nn.Module):
 
@@ -70,8 +72,3 @@ class NeuralODEClassifier(nn.Module):
             "output_proj": count(self.output_proj),
             "total": count(self),
         }
-
-
-
-
-
