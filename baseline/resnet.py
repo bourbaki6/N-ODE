@@ -15,7 +15,6 @@ class ResidualBlock(nn.Module):
     def forward(self, h: torch.Tensor) -> torch.Tensor:
         return h + self.net(h)   
  
- 
 class ResNetBaseline(nn.Module):
  
     def __init__(
