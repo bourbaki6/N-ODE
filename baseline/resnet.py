@@ -1,8 +1,14 @@
+#--- Arch.: input_proj -> N resiudual blocks -> output_proj---#
+
+#--- Chen et al states that the ODE and resnet are same when 
+#    ODE is integrated with euelr and num_steps = N.
+#    but ODE uses far fewer params as 1 ODEFunction can replace all N blocks---#
 import torch
 import torch.nn as nn
  
  
 class ResidualBlock(nn.Module):
+    #--- h_(t+1) = h_t + f(h_t) ---#
  
     def __init__(self, hidden_dim: int = 64):
         super().__init__()

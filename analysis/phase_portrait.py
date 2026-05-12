@@ -12,7 +12,7 @@ from matplotlib.lines import Line2D
 from pathlib import Path
 from sklearn.decomposition import PCA
 
-from models import NeuralODEClassifier
+from models.classifier import NeuralODEClassifier
 from data.dataset import get_dataloaders, get_class_names
 from utils import get_device, load_checkpoint
 
@@ -57,12 +57,10 @@ def get_hidden_trajectories(model: NeuralODEClassifier, loader, device: torch.de
 
     return {
         "trajectories": np.concatenate(all_trajs,  axis=0)[:max_samples],
-        "h0":           np.concatenate(all_h0,     axis=0)[:max_samples],
-        "h1":           np.concatenate(all_h1,     axis=0)[:max_samples],
-        "labels":       np.concatenate(all_labels, axis=0)[:max_samples],
+        "h0": np.concatenate(all_h0, axis=0)[:max_samples],
+        "h1":  np.concatenate(all_h1, axis=0)[:max_samples],
+        "labels": np.concatenate(all_labels, axis=0)[:max_samples],
     }
-
-
 
 def plot_phase_portrait(
     model: NeuralODEClassifier,

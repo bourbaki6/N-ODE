@@ -1,4 +1,5 @@
-
+#--- Benchmark: accuracy, speed, and NFE
+#    loading one trained checkpoint and evaluates it under different solver ---#
 
 import argparse
 import time
@@ -24,6 +25,7 @@ def benchmark_solver(
 ) -> dict:
    
     model.set_solver(solver, num_steps=num_steps)
+    
     if rtol is not None:
         model.ode_block.rtol = rtol
         model.ode_block.atol = rtol * 0.1
@@ -44,12 +46,13 @@ def benchmark_solver(
             t0 = time.perf_counter()
             log_probs = model(images)
             t1 = time.perf_counter()
+            times.append((t1 - t0) * 1000 / images.size(0)) 
 
-            preds = log_probs.argmax(dim=1)
+            preds = log_probs.argmax(dim = 1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
             nfe_list.append(model.nfe)
-            times.append((t1 - t0) * 1000 / images.size(0)) 
+            
 
     return {
         "accuracy": correct / total,
@@ -61,30 +64,37 @@ def benchmark_solver(
 def run_comparison(model, test_loader, device, save_dir: str):
 
     results = {}
-
+    
+    #---EULER---#
     print("\n Benchmarking Euler solver")
+    
     euler_steps = [2, 4, 6, 8, 10, 15, 20]
     results["euler"] = []
+    
     for steps in euler_steps:
         r = benchmark_solver(model, test_loader, device, "euler", num_steps = steps)
         r["num_steps"] = steps
         results["euler"].append(r)
         print(f"  Euler steps = {steps:3d}: acc = {r['accuracy']*100:.2f}%  "
               f"time = {r['avg_time_ms']:.2f}ms  NFE={r['avg_nfe']:.0f}")
-
+    
+    #---  RK 4---#
     print("\n Benchmarking RK4 solver")
     rk4_steps = [2, 4, 6, 8, 10, 15, 20]
     results["rk4"] = []
+    
     for steps in rk4_steps:
         r = benchmark_solver(model, test_loader, device, "rk4", num_steps = steps)
         r["num_steps"] = steps
         results["rk4"].append(r)
         print(f"  RK4   steps={steps:3d}: acc={r['accuracy']*100:.2f}%  "
               f"time={r['avg_time_ms']:.2f}ms  NFE = {r['avg_nfe']:.0f}")
-
+    
+    #--- RK 45---#
     print("\n Benchmarking RK45 solver")
     tolerances = [1e-1, 5e-2, 1e-2, 5e-3, 1e-3, 5e-4]
     results["rk45"] = []
+    
     for tol in tolerances:
         r = benchmark_solver(model, test_loader, device, "rk45", rtol=tol)
         r["rtol"] = tol
@@ -106,10 +116,10 @@ def run_comparison(model, test_loader, device, save_dir: str):
     ax.set_ylabel("Test Accuracy (%)", fontsize = 11)
     ax.set_title("Accuracy vs NFE", fontsize = 10)
     ax.legend()
-    ax.grid(True, alpha = 0.3)
     ax.annotate("\n Higher accuracy\n and  Fewer evaluations\n(top-left corner is ideal)",
                 xy = (0.02, 0.02), xycoords="axes fraction", fontsize = 8,
                 bbox=dict(boxstyle="round", facecolor="lightyellow", alpha = 0.8))
+
 
     ax2 = axes[1]
     for solver, color in [("euler", "tomato"), ("rk4", "steelblue"), ("rk45", "seagreen")]:
@@ -121,9 +131,7 @@ def run_comparison(model, test_loader, device, save_dir: str):
     ax2.set_ylabel("Test Accuracy (%)", fontsize = 11)
     ax2.set_title("Accuracy vs Speed", fontsize = 10)
     ax2.legend()
-    ax2.grid(True, alpha = 0.3)
-
-
+    
     ax3 = axes[2]
     for solver, color in [("euler", "tomato"), ("rk4", "steelblue")]:
         steps = [r["num_steps"] for r in results[solver]]
@@ -134,14 +142,15 @@ def run_comparison(model, test_loader, device, save_dir: str):
     ax3.set_ylabel("NFE", fontsize = 11)
     ax3.set_title("NFE vs num_steps (fixed solvers)\nSlope: Euler=1×, RK4=4×", fontsize = 10) 
     ax3.legend()
-    ax3.grid(True, alpha = 0.3)
     ax3.annotate("Slope ratio shows\nRK4 costs 4× NFE\nper step vs Euler",
                 xy = (0.6, 0.05), xycoords = "axes fraction", fontsize = 8,
                 bbox = dict(boxstyle = "round", facecolor="lightyellow", alpha=0.8))
 
+    
     plt.tight_layout()
     save_path = f"{save_dir}/solver_comparison.png"
     plt.savefig(save_path, dpi = 150, bbox_inches = "tight")
+    plt.close()
     print(f"\nPlot saved: {save_path}")
     plt.show()
 
