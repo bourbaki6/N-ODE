@@ -14,7 +14,6 @@ import torch
 import torch.nn as nn
 
 
-
 class ODEFunction(nn.Module):
 
     def __init__(self, hidden_dim: int =64):

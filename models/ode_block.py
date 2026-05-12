@@ -3,8 +3,8 @@
 
 import torch
 import torch.nn as nn
-from .ode_solver import Euler, RK4, RK45
-from .adjoint import AdjointODEBlock
+from models.ode_solver import Euler, RK4, RK45
+from models.adjoint import AdjointODEBlock
 
 
 class ODEBlock(nn.Module):

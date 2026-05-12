@@ -4,9 +4,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from models import NeuralODEClassifier
-from baseline import ResNetBaseline
-from data import get_dataloaders
+from models.classifier import NeuralODEClassifier
+from baseline.resnet import ResNetBaseline
+from data.dataset import get_dataloaders
 from utils import (
     get_device, save_checkpoint, MetricsLogger,
     compute_accuracy, measure_nfe,

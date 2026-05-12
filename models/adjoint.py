@@ -8,7 +8,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Function
-from .ode_solver import RK4
+from models.ode_solver import RK4
 
 
 class AdjointODEFunc(Function):

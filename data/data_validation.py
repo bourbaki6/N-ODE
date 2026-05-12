@@ -6,6 +6,7 @@ import torch
 import matplotlib
 matplotlib.use("Agg")          
 import matplotlib.pyplot as plt
+
 from data.dataset import get_dataloaders, get_class_names, DATASET_STATS
 
 GREEN = "\033[92m"

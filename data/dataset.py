@@ -154,7 +154,7 @@ def get_dataloaders(
 
     info = DATASET_STATS[dataset_name]
     print(f"Dataset : {dataset_name}")
-    print(f"Image size  : {info['channels']}×{info['image_size']}×{info['image_size']}  ->  input_dim={get_input_dim(dataset_name)}")
+    print(f"Image size  : {info['channels']}x{info['image_size']}x{info['image_size']}  ->  input_dim={get_input_dim(dataset_name)}")
     print(f"Classes: {info['num_classes']}")
     print(f" Training: {len(train_dataset):,} samples, {len(train_loader):,} batches")
     print(f" Test: {len(test_dataset):,} samples,  {len(test_loader):,} batches")
@@ -183,7 +183,7 @@ def get_class_names(dataset_name: str) -> list:
         ]
 
     elif dataset_name == "cifar100":
-        #--- all 100 fine-grained CIFAR-100 classes in label order; taken from claude ---#
+        #--- all 100 fine-grained CIFAR-100 classes in label order; from official CIFAR website---#
         return [
             "apple",          "aquarium_fish",  "baby",           "bear",
             "beaver",         "bed",            "bee",            "beetle",

@@ -5,7 +5,7 @@
 import torch
 import torch.nn as nn
 from models.odefunc import ODEFunction
-from .ode_block import ODEBlock
+from models.ode_block import ODEBlock
 
 class NeuralODEClassifier(nn.Module):
 

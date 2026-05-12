@@ -3,7 +3,7 @@
 import torch
 from typing import Callable
 
-from .odefunc import ODEFunction
+from models.odefunc import ODEFunction
 
 class Euler:
     #---Only for 1st order ODE. Fixed step size---#
