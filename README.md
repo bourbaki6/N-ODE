@@ -36,5 +36,8 @@ GroupNorm → Linear(64 -> 10)          # output_proj
 log_softmax → NLLLoss
 ```
 
-
-
+## Reference
+ 
+> Chen, R. T. Q., Rubanova, Y., Bettencourt, J., & Duvenaud, D. (2018).
+> **Neural Ordinary Differential Equations.** NeurIPS 2018.
+> https://arxiv.org/abs/1806.07366
