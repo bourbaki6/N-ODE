@@ -15,7 +15,6 @@ def load_log(path: str) -> list:
     with open(path) as f:
         return json.load(f)
 
-
 def plot_nfe_over_training(log_paths: list, labels: list, save_path: str = None):
    
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))

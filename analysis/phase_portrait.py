@@ -108,8 +108,6 @@ def plot_phase_portrait(
 
     fig, axes = plt.subplots(1, 2, figsize=(15, 6))
     fig.suptitle(title, fontsize=13, fontweight="bold")
-
-    # ── Left: vector field streamplot + final states ─────────────────────
     ax = axes[0]
     speed = np.sqrt(u ** 2 + v ** 2)
     ax.streamplot(
@@ -134,7 +132,7 @@ def plot_phase_portrait(
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
 
-    # ── Right: trajectory lines h(0)→h(1) per class ──────────────────────
+ 
     ax2 = axes[1]
     for cls_idx in range(min(10, len(class_names))):
         indices = np.where(data["labels"] == cls_idx)[0]
@@ -156,9 +154,7 @@ def plot_phase_portrait(
     ax2.set_xlabel("PC1")
     ax2.set_ylabel("PC2")
 
-    # BUG FIX: 'from matplotlib.lines import Line2D' was buried inside the
-    # function body (inside the plotting block), causing an import inside a
-    # nested scope. Moved to module-level import at the top of the file.
+
     handles = [
         Line2D([0], [0], color=colors_10[i], linewidth=2,
                label=class_names[i] if i < len(class_names) else str(i))
@@ -180,8 +176,8 @@ def plot_phase_portrait(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint",    type=str, required=True)
-    parser.add_argument("--config",        type=str, default="configs/mnist.yaml")
+    parser.add_argument("--checkpoint", type = str, required=True)
+    parser.add_argument("--config", type = str, default="configs/mnist.yaml")
     parser.add_argument("--show_untrained", action="store_true",
                         help="Also plot portrait for a randomly-initialised model")
     parser.add_argument("--save_dir",      type=str, default="analysis/plots")
