@@ -8,11 +8,9 @@ venv/
 .env/
 .envrc
 
-outputs/
-logs/
-
 git/
 .gitignore
 
 .vscode/
+
 .idea/

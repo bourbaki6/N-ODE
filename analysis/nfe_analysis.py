@@ -91,7 +91,7 @@ def plot_nfe_over_training(log_paths: list, labels: list, save_path: str = None)
     plt.close()
 
 def plot_nfe_histogram(log_path: str, save_path: str = None):
-    
+
     records = load_log(log_path)
     nfes = [r.get("nfe") for r in records if "nfe" in r]
 
@@ -100,36 +100,33 @@ def plot_nfe_histogram(log_path: str, save_path: str = None):
         return
 
     n = len(nfes)
-    early = nfes[:n//3]
-    mid = nfes[n//3 : 2*n//3]
-    late = nfes[2*n//3:]
+    early = nfes[:n // 3]
+    mid   = nfes[n // 3: 2 * n // 3]
+    late  = nfes[2 * n // 3:]
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    fig.suptitle("NFE Distribution: Early vs Late Training", fontsize=13)
-
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8, 5))   
     fig.suptitle("NFE Distribution: Early vs Mid vs Late Training",
                  fontsize=13, fontweight="bold")
 
     lo = min(nfes) - 1
     hi = max(nfes) + 1
-
     bins = np.linspace(lo, hi, max(20, int(hi - lo) + 2))
-    
-    ax.hist(early, bins = bins, alpha = 0.5, label = "Early epochs", color = "tomato")
-    ax.hist(mid, bins = bins, alpha = 0.5, label = "Mid epochs", color ="orange")
-    ax.hist(late, bins = bins, alpha = 0.5, label = "Late epochs",  color  = "steelblue")
 
-    ax.axvline(np.mean(early), color="tomato", linestyle = "--", alpha = 0.8, label = f"Early mean: {np.mean(early):.1f}")
-    ax.axvline(np.mean(late), color="steelblue", linestyle = "--", alpha = 0.8, label = f"Late mean: {np.mean(late):.1f}")
+    ax.hist(early, bins=bins, alpha=0.5, label="Early epochs",  color="tomato")
+    ax.hist(mid,   bins=bins, alpha=0.5, label="Mid epochs",    color="orange")
+    ax.hist(late,  bins=bins, alpha=0.5, label="Late epochs",   color="steelblue")
 
-    ax.set_xlabel("NFE per forward pass", fontsize = 11)
-    ax.set_ylabel("Count (epochs)", fontsize = 11)
-    
+    ax.axvline(np.mean(early), color="tomato",    linestyle="--", alpha=0.8,
+               label=f"Early mean: {np.mean(early):.1f}")
+    ax.axvline(np.mean(late),  color="steelblue", linestyle="--", alpha=0.8,
+               label=f"Late mean: {np.mean(late):.1f}")
+
+    ax.set_xlabel("NFE per forward pass", fontsize=11)
+    ax.set_ylabel("Count (epochs)",       fontsize=11)
     ax.legend()
 
     plt.tight_layout()
-    
+
     if save_path:
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
         print(f"  Saved: {save_path}")

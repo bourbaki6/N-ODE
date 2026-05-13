@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+from data.dataset import get_input_dim 
 from models.classifier import NeuralODEClassifier
 from data.dataset import get_dataloaders
 from utils import get_device, load_checkpoint
@@ -170,14 +171,17 @@ def main():
     Path(args.save_dir).mkdir(parents=True, exist_ok=True)
     device = get_device()
 
-    m_cfg = cfg["model"]
+    m_cfg = cfg["model"] 
+
     model = NeuralODEClassifier(
-        hidden_dim = m_cfg["hidden_dim"],
+        hidden_dim  = m_cfg["hidden_dim"],
         num_classes = m_cfg["num_classes"],
         solver = m_cfg["solver"],
-        num_steps = m_cfg["num_steps"],
+        num_steps  = m_cfg["num_steps"],
+        input_dim = get_input_dim(cfg["dataset"]["name"]),  
     ).to(device)
-    load_checkpoint(model, args.checkpoint, device=device)
+    
+    load_checkpoint(model, args.checkpoint, device = device)
 
     _, test_loader = get_dataloaders(
         dataset_name = cfg["dataset"]["name"],

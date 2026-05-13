@@ -69,17 +69,28 @@ class AdjointODEFunc(Function):
 
         for i in range(num_steps - 1, -1, -1):
             t_cur = torch.tensor(
-                t0.item() + i * dt,
-                dtype = h0.dtype, device = h0.device
+            t0.item() + i * dt,
+            dtype=h0.dtype, device=h0.device
+            )
+            t_half = torch.tensor(
+            t0.item() + i * dt - 0.5 * dt,
+            dtype=h0.dtype, device=h0.device
+            )
+            t_prev = torch.tensor(
+            t0.item() + (i - 1) * dt,
+            dtype=h0.dtype, device=h0.device
             )
 
-            aug_derivs = augmented_dynamics(t_cur, aug_state)
+            k1 = augmented_dynamics(t_cur,  aug_state)
+            k2 = augmented_dynamics(t_half, tuple(s - 0.5 * dt * d for s, d in zip(aug_state, k1)))
+            k3 = augmented_dynamics(t_half, tuple(s - 0.5 * dt * d for s, d in zip(aug_state, k2)))
+            k4 = augmented_dynamics(t_prev, tuple(s - dt * d  for s, d in zip(aug_state, k3)))
 
             aug_state = tuple(
-                s - d * dt
-                for s, d in zip(aug_state, aug_derivs)
-            )
-
+                s - (dt / 6.0) * (d1 + 2*d2 + 2*d3 + d4)
+                for s, d1, d2, d3, d4 in zip(aug_state, k1, k2, k3, k4)
+                )
+            
         dL_dh0 = aug_state[1]
         dL_dparams = aug_state[2:]
 

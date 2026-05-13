@@ -27,6 +27,7 @@ class ODEBlock(nn.Module):
         self.atol = atol
         self.t0 = t0
         self.t1 = t1
+        self.nfe_history = [] 
 
         self._adjoint_block =(AdjointODEBlock(odefunc, t0, t1) if solver == "adjoint" 
                               else None)

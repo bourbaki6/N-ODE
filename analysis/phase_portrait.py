@@ -53,7 +53,7 @@ def get_hidden_trajectories(model: NeuralODEClassifier, loader, device: torch.de
             all_h0.append(h0.cpu().numpy())
             all_h1.append(h.cpu().numpy())
             all_labels.append(labels.numpy())
-            collected += images.size(0)
+            n_collected += images.size(0)
 
     return {
         "trajectories": np.concatenate(all_trajs,  axis=0)[:max_samples],
