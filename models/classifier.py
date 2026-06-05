@@ -2,6 +2,9 @@
 #       input: linear -> GroupNorm -> Tanh
 #       ode_block: ODEFunction integrated by the chosen solver
 #       output: GroupNorm -> Linear ----# 
+
+#--- input_proj -> ODEblock -> output_proj ---#
+
 import torch
 import torch.nn as nn
 from models.odefunc import ODEFunction

@@ -34,7 +34,8 @@ class ODEBlock(nn.Module):
        
     def forward(self, h: torch.Tensor) -> torch.Tensor:
 
-        self.odefunc.reset_nfe()
+        if self.solver != "adjoint":
+            self.odefunc.reset_nfe()
 
         if self.solver == "adjoint":
             h1 = self._adjoint_block(h)
@@ -59,9 +60,9 @@ class ODEBlock(nn.Module):
             h1, rk45_nfe = RK45.rk45_solve(
                 self.odefunc, h,
                 t0 = self.t0, t1 = self.t1,
-                rtol = self.rtol, atol = self.atol,
+                rtol = self.rtol, 
+                atol = self.atol,
             )
-            self.odefunc.nfe = rk45_nfe
 
         else:
             raise ValueError(

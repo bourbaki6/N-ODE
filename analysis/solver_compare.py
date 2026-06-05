@@ -25,7 +25,7 @@ def benchmark_solver(
     n_batches: int = 20,
 ) -> dict:
    
-    model.set_solver(solver, num_steps=num_steps)
+    model.set_solver(solver, num_steps = num_steps)
     
     if rtol is not None:
         model.ode_block.rtol = rtol
@@ -79,7 +79,7 @@ def run_comparison(model, test_loader, device, save_dir: str):
         print(f"  Euler steps = {steps:3d}: acc = {r['accuracy']*100:.2f}%  "
               f"time = {r['avg_time_ms']:.2f}ms  NFE={r['avg_nfe']:.0f}")
     
-    #---  RK 4---#
+    #--- RK 4---#
     print("\n Benchmarking RK4 solver")
     rk4_steps = [2, 4, 6, 8, 10, 15, 20]
     results["rk4"] = []

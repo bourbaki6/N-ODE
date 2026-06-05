@@ -54,7 +54,7 @@ class AdjointODEFunc(Function):
                 retain_graph = False,
             )
 
-            dh_dt = f_val.detach()         
+            dh_dt = -f_val.detach()         
             da_dt = -grads[0] if grads[0] is not None else torch.zeros_like(h_aug)     
             dp_dt = tuple(-g if g is not None else torch.zeros_like(p)
                            for g, p in zip(grads[1:], func.parameters()))
@@ -69,19 +69,22 @@ class AdjointODEFunc(Function):
 
         for i in range(num_steps - 1, -1, -1):
             t_cur = torch.tensor(
-            t0.item() + i * dt,
-            dtype=h0.dtype, device=h0.device
+            t1.item() + i * dt,
+            dtype = h0.dtype, 
+            device = h0.device
             )
             t_half = torch.tensor(
-            t0.item() + i * dt - 0.5 * dt,
-            dtype=h0.dtype, device=h0.device
+            t1.item() + i * dt - 0.5 * dt,
+            dtype = h0.dtype, 
+            device = h0.device
             )
             t_prev = torch.tensor(
-            t0.item() + (i - 1) * dt,
-            dtype=h0.dtype, device=h0.device
+            t1.item() + (i - 1) * dt,
+            dtype = h0.dtype, 
+            device = h0.device
             )
 
-            k1 = augmented_dynamics(t_cur,  aug_state)
+            k1 = augmented_dynamics(t_cur, aug_state)
             k2 = augmented_dynamics(t_half, tuple(s - 0.5 * dt * d for s, d in zip(aug_state, k1)))
             k3 = augmented_dynamics(t_half, tuple(s - 0.5 * dt * d for s, d in zip(aug_state, k2)))
             k4 = augmented_dynamics(t_prev, tuple(s - dt * d  for s, d in zip(aug_state, k3)))
