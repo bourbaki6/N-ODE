@@ -23,17 +23,17 @@ The ODE models match ResNet-6 accuracy while using ~58% fewer parameters.
 Input (784)
     │
     ▼
-Linear → GroupNorm → Tanh          # input_proj: project to hidden_dim = 64
+Linear -> GroupNorm -> Tanh          # input_proj: project to hidden_dim = 64
     │
     ▼
 ODEBlock: integrate dh/dt = f(h,t) from t = 0 to t = 1
-    │   └── ODEFunction: Linear(65→64) -> Tanh -> Linear(64 -> 64)
+    │   └── ODEFunction: Linear(65 -> 64) -> Tanh -> Linear(64 -> 64)
     │         (time t concatenated to h at each step)
     ▼
-GroupNorm → Linear(64 -> 10)          # output_proj
+GroupNorm -> Linear(64 -> 10)          # output_proj
     │
     ▼
-log_softmax → NLLLoss
+log_softmax -> NLLLoss
 ```
 
 ## Reference
