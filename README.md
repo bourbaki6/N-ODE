@@ -1,4 +1,4 @@
-# Neural Ordinary Differential Equation Solver - Reproduction & Analysis
+# Neural Ordinary Differential Equation Solver 
  
 A from-scratch implementation of **Neural Ordinary Differential Equations** (Chen et al., NeurIPS 2018) for image classification, with a full solver suite, custom adjoint backpropagation, and comparative analysis against a ResNet baseline.
 
